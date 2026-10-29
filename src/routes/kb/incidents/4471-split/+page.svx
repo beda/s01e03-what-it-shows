@@ -1,0 +1,62 @@
+---
+layout: runbook
+title: '#4471 · three problems, not one'
+owner: beda
+status: proposed
+reviewed: 2026-10-29
+signature: beda
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const repo = 'https://github.com/beda/s01e03-what-it-shows/issues';
+  const tickets = {
+    parser: { what: 'the shared parser reads day-first dates month first', href: `${repo}/1`, label: 'issue 1' },
+    hint: { what: 'booking-v3 prints MM/DD/YYYY under a field that reads the day first', href: `${repo}/2`, label: 'issue 2' },
+    'one-day': { what: 'the date moves by one day, not a day/month swap', href: `${repo}/3`, label: 'issue 3' },
+  };
+</script>
+
+[#4471](/kb/incidents/4471) is marked known: one issue, one fix queued. Its reports say otherwise.
+They hold three problems, and the queued parser fix closes only one of them.
+
+<Callout kind="warn">
+Fixing the parser leaves the booking-v3 form and the one-day shift broken. Each problem now has
+its own ticket. Keep #4471 for the parser.
+</Callout>
+
+## What #4471 holds
+
+<ProblemTable ticket={4471} {tickets} />
+
+- **parser.** Every tenant on file writes the day first, and the shared parser reads the month
+  first. Any date with a day of 12 or less comes out swapped: 7 April becomes 4 July.
+- **hint.** booking-v3 prints `MM/DD/YYYY` under its date field. People type what it says, and
+  the form reads it the tenant's way. The result is the same swap through a different bug, and
+  only on the booking form of booking-v3 tenants. A parser fix does not touch it.
+- **one-day.** These reports describe a day lost or gained, not a swap: Tuesday 12 May shown as
+  Monday 11 May, a client in Lisbon and a client in Toronto seeing different days for the same
+  meeting, every June booking one day off. That points to time zones or offsets. The desk already
+  marked these ids as one-day moves in `desk-notes.json`, but they were still counted as parser.
+
+## How they ended up in one ticket
+
+Triage merges by subject line alone ([decision 0001](/kb/decisions/0001-dedupe-by-subject)).
+"Wrong date again" is the same subject whatever the cause, so all three problems landed in #4471.
+Intake's tag doesn't help either: it guesses from the reporter's browser and disagrees with the
+cause on dozens of these reports. The desk's own cause table on [#4471](/kb/incidents/4471)
+already sets the form reports apart, and the one-day reports are already in the desk's notes.
+Nobody opened tickets for them.
+
+The export repeats some ids across overlapping pages. Count unique ids, not rows.
+
+## What to do
+
+1. Keep #4471 for the parser problem only. Move the hint and one-day reports to their tickets.
+2. Before you merge a date report, check the tenant's booking form and whether the report
+   describes a swap or a single-day shift. The subject line is not enough.
+
+<RenderStamp {signature} />
