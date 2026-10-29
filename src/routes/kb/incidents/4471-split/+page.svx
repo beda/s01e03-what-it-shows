@@ -40,7 +40,8 @@ its own ticket. Keep #4471 for the parser.
 - **one-day.** These reports describe a day lost or gained, not a swap: Tuesday 12 May shown as
   Monday 11 May, a client in Lisbon and a client in Toronto seeing different days for the same
   meeting, every June booking one day off. That points to time zones or offsets. The desk already
-  marked these ids as one-day moves in `desk-notes.json`, but they were still counted as parser.
+  marked these ids as one-day moves in `desk-notes.json`. It files them under parser and counts
+  them there, so the parser row includes them; they have their own ticket all the same.
 
 ## How they ended up in one ticket
 

@@ -10,7 +10,8 @@
     $props();
 
   const result = $derived(problemsIn(reports as Report[], ticket, tenantOf, notes.oneDayMove));
-  const total = $derived(result.groups.reduce((n, g) => n + g.reports.length, 0));
+  const filed = $derived(result.groups.filter((g) => !g.filedUnder));
+  const total = $derived(filed.reduce((n, g) => n + g.reports.length, 0));
 </script>
 
 <p class="sum">
@@ -26,7 +27,7 @@
     {#each result.groups as g (g.problem)}
       <tr>
         <td><code>{g.problem}</code><br /><span class="what">{tickets[g.problem]?.what}</span></td>
-        <td>{g.reports.length}</td>
+        <td>{g.reports.length}{#if g.filedUnder}<br /><span class="what">also in <code>{g.filedUnder}</code></span>{/if}</td>
         <td>{g.tenants}</td>
         <td>{g.firstSeen} → {g.lastSeen}</td>
         <td>{#if tickets[g.problem]}<a href={tickets[g.problem].href}>{tickets[g.problem].label}</a>{:else}none{/if}</td>
@@ -34,7 +35,7 @@
     {/each}
   </tbody>
   <tfoot>
-    <tr><td>total</td><td><strong>{total}</strong></td><td colspan="3">{total === result.merged ? 'every report placed once' : `${result.merged - total} not placed`}</td></tr>
+    <tr><td>total</td><td><strong>{total}</strong></td><td colspan="3">{total === result.merged ? 'every report filed once' : `${result.merged - total} not filed`}{#each result.groups.filter((g) => g.filedUnder) as g (g.problem)}; the {g.reports.length} <code>{g.problem}</code> reports are filed under <code>{g.filedUnder}</code>, as the desk files them{/each}</td></tr>
   </tfoot>
 </table>
 
